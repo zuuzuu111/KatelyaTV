@@ -338,12 +338,15 @@ function getUpstashRedisClient(): Redis {
   let client: Redis | undefined = (global as any)[globalKey] || (global as any)[legacyKey];
 
   if (!client) {
-    const upstashUrl = process.env.UPSTASH_URL;
-    const upstashToken = process.env.UPSTASH_TOKEN;
+    // 兼容 Vercel 自动注入的环境变量
+    const upstashUrl =
+      process.env.UPSTASH_REDIS_REST_URL || process.env.UPSTASH_URL;
+    const upstashToken =
+      process.env.UPSTASH_REDIS_REST_TOKEN || process.env.UPSTASH_TOKEN;
 
     if (!upstashUrl || !upstashToken) {
       throw new Error(
-        'UPSTASH_URL and UPSTASH_TOKEN env variables must be set'
+        'Upstash Redis credentials not found. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN (from Vercel integration) or UPSTASH_URL and UPSTASH_TOKEN manually.'
       );
     }
 
@@ -358,6 +361,9 @@ function getUpstashRedisClient(): Redis {
           Math.min(1000 * Math.pow(2, retryCount), 30000),
       },
     });
+
+    (global as any)[globalKey] = client;
+  }
 
     console.log('Upstash Redis client created successfully');
 
