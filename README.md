@@ -182,19 +182,23 @@ NEXT_PUBLIC_ENABLE_REGISTER=true
 1. **Fork 仓库**：将 [KatelyaTV](https://github.com/katelya77/KatelyaTV) Fork 到你的 GitHub 账户。
 
 2. **部署到 Vercel**：
+
    - 登录 [Vercel](https://vercel.com/)，通过你的 GitHub 账户导入刚刚 Fork 的仓库并部署。
 
 3. **关联 Upstash（关键步骤）**：
+
    - 在 Vercel 项目的控制面板中，进入 **Settings** > **Integrations**。
    - 搜索 "Upstash" 并点击 **Add Integration**。
    - 按照指引授权并创建一个新的 Redis 数据库。Vercel 会自动将数据库凭证（`UPSTASH_REDIS_REST_URL` 和 `UPSTASH_REDIS_REST_TOKEN`）添加到你的项目环境变量中。
 
 4. **配置项目环境变量**：
+
    - 下载环境变量配置模板：
      ```bash
      curl -O https://raw.githubusercontent.com/katelya77/KatelyaTV/main/.env.vercel.example
      ```
    - 在 Vercel 项目的 **Settings** > **Environment Variables** 中，添加以下变量：
+
      ```bash
      # 启用 Upstash 作为存储后端
      NEXT_PUBLIC_STORAGE_TYPE=upstash
@@ -206,6 +210,7 @@ NEXT_PUBLIC_ENABLE_REGISTER=true
      # （可选）允许新用户注册
      NEXT_PUBLIC_ENABLE_REGISTER=true
      ```
+
    - **重要**：你不再需要手动从 Upstash 官网复制和粘贴 `UPSTASH_URL` 和 `UPSTASH_TOKEN`。
 
 5. **重新部署**：

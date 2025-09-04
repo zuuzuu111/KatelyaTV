@@ -363,11 +363,6 @@ function getUpstashRedisClient(): Redis {
     });
 
     (global as any)[globalKey] = client;
-  }
-
-    console.log('Upstash Redis client created successfully');
-
-    (global as any)[globalKey] = client;
     // 同步设置旧的全局键，保持向后兼容
     (global as any)[legacyKey] = client;
   }

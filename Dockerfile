@@ -1,9 +1,7 @@
 # ---- 第 1 阶段：安装依赖 ----
 FROM --platform=$BUILDPLATFORM node:20-alpine AS deps
 
-# 启用 corepack 并激活 pnpm（Node20 默认提供 corepack）
-RUN corepack enable && corepack prepare pnpm@latest --activate
-
+# 为 Docker 构建使用 npm，避免 Windows pnpm 符号链接问题
 WORKDIR /app
 
 # 仅复制依赖清单，提高构建缓存利用率
@@ -12,12 +10,11 @@ COPY package.json pnpm-lock.yaml ./
 # 针对ARM架构优化：设置更大的内存限制和超时时间
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 
-# 安装所有依赖（含 devDependencies，后续会裁剪）
-RUN pnpm install --frozen-lockfile
+# 使用 npm 代替 pnpm，避免符号链接权限问题
+RUN npm install --frozen-lockfile
 
 # ---- 第 2 阶段：构建项目 ----
 FROM --platform=$BUILDPLATFORM node:20-alpine AS builder
-RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # 针对ARM架构优化：设置更大的内存限制
@@ -38,7 +35,7 @@ ENV DOCKER_ENV=true
 RUN sed -i "/const inter = Inter({ subsets: \['latin'] });/a export const dynamic = 'force-dynamic';" src/app/layout.tsx
 
 # 生成生产构建
-RUN pnpm run build
+RUN npm run build
 
 # ---- 第 3 阶段：生成运行时镜像 ----
 FROM node:20-alpine AS runner
